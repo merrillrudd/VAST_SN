@@ -4,7 +4,7 @@
 ####################################################
 
 ## install VAST from GitHub
-devtools::install_github("james-thorson/VAST")
+devtools::install_github("james-thorson/VAST", ref = "development")
 
 ## install some additional utilities for plotting
 devtools::install_github("merrillrudd/VASTPlotUtils")
@@ -19,7 +19,7 @@ library(tidyverse)
 ####################
 
 ## change to your directory
-main_dir <- "~/VAST_SN/Siletz_example"
+main_dir <- "~/Projects/Spatiotemporal/VAST_SN/Siletz_example"
 data_dir <- file.path(main_dir, "data")
 
 ####################
@@ -410,7 +410,7 @@ fit = fit_model( "settings"=settings,
                   Network_sz = Network_sz,
                   model_args = list(Map = Map),
                   X_gtp = X_gtp_all, X_itp = X_itp_all,
-                  Xconfig_zcp = Xconfig_all, 
+                  Xconfig_zcp = Xconfig_all2, 
                   test_fit = FALSE)
 
 ## check parameter estimates and final gradients
@@ -423,7 +423,8 @@ saveRDS(fit, file.path(path, "Fit.rds"))
 fit <- readRDS(file.path(path, "Fit.rds")) 
 
 ## plot maps by category
-VASTPlotUtils::plot_maps(plot_set = c(1,2,3,7), fit = fit, Sdreport = fit$parameter_estimates$SD, TmbData = fit$data_list, spatial_list = fit$spatial_list, DirName = fig, category_names = cat_names, cex = 0.5)
+VASTPlotUtils::plot_maps(plot_set = c(1,2,7), fit = fit, Sdreport = fit$parameter_estimates$SD, TmbData = fit$data_list, spatial_list = fit$spatial_list, DirName = fig, category_names = cat_names, cex = 0.5)
+VASTPlotUtils::plot_maps(plot_set = c(3), fit = fit, Sdreport = fit$parameter_estimates$SD, TmbData = fit$data_list, spatial_list = fit$spatial_list, DirName = fig, category_names = cat_names, cex = 0.5, Zlim = c(-3,6))
 
 ## plot maps by year
 VASTPlotUtils::plot_maps(plot_set = c(3), fit = fit, Sdreport = fit$parameter_estimates$SD, TmbData = fit$data_list, spatial_list = fit$spatial_list, DirName = fig, category_names = cat_names, cex = 0.75, Panel = "Year", Zlim = c(-3,8))

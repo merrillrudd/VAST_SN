@@ -55,7 +55,7 @@ obs_juv <- juv_raw %>%
         filter(Year_ > 0) %>% 
         select(Population, Year_, CohoParr, Survey_Len, sampled_X, sampled_Y, ChildNode) %>% 
         rename(Year=Year_, Count=CohoParr, dist_i=Survey_Len, Lat=sampled_Y, Lon=sampled_X, child_i=ChildNode) %>% 
-        mutate(dist_i = dist_i / 1000) %>%
+        # mutate(dist_i = dist_i / 1000) %>%
         mutate(Survey="Juveniles") %>%
         mutate(Density = Count/dist_i)
 

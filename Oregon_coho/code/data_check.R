@@ -21,8 +21,11 @@ dir.create(fig_dir, showWarnings=FALSE)
 ## Read in data
 ###########################
 
+## same as Spawner_data_final.csv
 spawn_raw <- read.csv(file.path(data_dir, "spawners_wNetwork.csv"))
+
 juv_raw <- read.csv(file.path(data_dir, "juveniles_wNetwork.csv"))
+
 hab_data_raw <- read.csv(file.path(data_dir, "habitat_wNetwork.csv"))
 hab_siletz_raw <- read.csv(file.path(data_dir, "habitat_Siletz.csv"))
 
@@ -53,9 +56,9 @@ obs_spawn <- spawn_raw %>%
 
 obs_juv <- juv_raw %>% 
         filter(Year_ > 0) %>% 
-        select(Population, Year_, CohoParr, Survey_Len, sampled_X, sampled_Y, ChildNode) %>% 
-        rename(Year=Year_, Count=CohoParr, dist_i=Survey_Len, Lat=sampled_Y, Lon=sampled_X, child_i=ChildNode) %>% 
-        # mutate(dist_i = dist_i / 1000) %>%
+        select(Population, Year_, CohoPerKil, sampled_X, sampled_Y, ChildNode) %>% 
+        rename(Year=Year_, Count=CohoPerKil, Lat=sampled_Y, Lon=sampled_X, child_i=ChildNode) %>% 
+        mutate(dist_i = 1) %>%
         mutate(Survey="Juveniles") %>%
         mutate(Density = Count/dist_i)
 

@@ -43,8 +43,8 @@ saveRDS(obs, file.path(data_dir, "siletz_observations.rds"))
 net_nodes <- network$child_s
 Network_sz_LL <- network
 Network_sz <- network %>% select("parent_s", "child_s", "dist_s")
-net <- plot_network(Network_sz_LL = Network_sz_LL, arrows=TRUE, root=TRUE)
-ggsave(file.path(fig_dir, "Network.png"), net)
+# net <- plot_network(Network_sz_LL = Network_sz_LL, arrows=TRUE, root=TRUE)
+# ggsave(file.path(fig_dir, "Network.png"), net)
 
 ####################
 ## Observations
@@ -81,11 +81,11 @@ Data_dens <- data.frame( "Catch_KG" = obs$Density,
 Data_dens_spawn <- Data_dens %>% filter(Category == "Spawners")
 Data_dens_juv <- Data_dens %>% filter(Category == "Juveniles")
 
-plot_network(Network_sz_LL = Network_sz_LL, Data = Data_count, arrows=TRUE, FilePath=fig_dir, FileName = "Survey_Locs")
-# plot_network(Network_sz_LL = Network_sz_LL, Data = Data_count, arrows=TRUE, byYear=TRUE, FilePath=fig_dir, FileName = "Survey_Locs_byYear")
-# plot_network(Network_sz_LL = Network_sz_LL, Data = Data_dens, arrows=TRUE, byYear=TRUE, byValue=TRUE, FilePath=fig_dir, FileName = "Density_byYear")
-plot_network(Network_sz_LL = Network_sz_LL, Data = Data_dens %>% filter(Category=="Spawners"), value_label = "Spawner density", obs_color=RColorBrewer::brewer.pal(3,"Set1")[2], arrows=TRUE, byYear=TRUE, byValue=TRUE, FilePath=fig_dir, FileName = "Spawner_Density_byYear")
-plot_network(Network_sz_LL = Network_sz_LL, Data = Data_dens %>% filter(Category=="Juveniles"), value_label = "Juvenile density", obs_color=RColorBrewer::brewer.pal(3,"Set1")[1], arrows=TRUE, byYear=TRUE, byValue=TRUE, FilePath=fig_dir, FileName = "Juvenile_Density_byYear")
+# plot_network(Network_sz_LL = Network_sz_LL, Data = Data_count, arrows=TRUE, FilePath=fig_dir, FileName = "Survey_Locs")
+# # plot_network(Network_sz_LL = Network_sz_LL, Data = Data_count, arrows=TRUE, byYear=TRUE, FilePath=fig_dir, FileName = "Survey_Locs_byYear")
+# # plot_network(Network_sz_LL = Network_sz_LL, Data = Data_dens, arrows=TRUE, byYear=TRUE, byValue=TRUE, FilePath=fig_dir, FileName = "Density_byYear")
+# plot_network(Network_sz_LL = Network_sz_LL, Data = Data_dens %>% filter(Category=="Spawners"), value_label = "Spawner density", obs_color=RColorBrewer::brewer.pal(3,"Set1")[2], arrows=TRUE, byYear=TRUE, byValue=TRUE, FilePath=fig_dir, FileName = "Spawner_Density_byYear")
+# plot_network(Network_sz_LL = Network_sz_LL, Data = Data_dens %>% filter(Category=="Juveniles"), value_label = "Juvenile density", obs_color=RColorBrewer::brewer.pal(3,"Set1")[1], arrows=TRUE, byYear=TRUE, byValue=TRUE, FilePath=fig_dir, FileName = "Juvenile_Density_byYear")
 
 ####################
 ## Habitat
@@ -119,6 +119,8 @@ hablist <- lapply(1:n_p, function(p){
 
 			interp_df <- data.frame('Population'=unique(sub$Population), 'child_s'=find_child, 'Lon'=find_lon, 'Lat'=find_lat, 'HabitatImpact'=unique(sub$HabitatImpact), 'variable'=unique(sub$variable), 'value'=as.numeric(compute$z))				
 
+			sub$Type = "Observed"
+			interp_df$Type <- "Interpolated"
 			hab_info <- rbind.data.frame(interp_df, sub)
 			obs_new <- sapply(1:nrow(hab_info), function(x) ifelse(is.na(hab_info$value[x]),mean(hab_info$value,na.rm=TRUE),hab_info$value[x]))
 			hab_info$value <- obs_new			
@@ -135,12 +137,22 @@ hablist <- lapply(1:n_p, function(p){
 			ggsave(file.path(fig_dir, paste0(habvar[p], "_interpolated.png")),p3)		
 
 			hab_new <- lapply(1:nrow(Network_sz_LL), function(x){
+			# for(x in 1:nrow(Network_sz_LL)){
 				child <- Network_sz_LL$child_s[x]
 				find_hab <- hab_info %>% filter(child_s==child)
 				if(nrow(find_hab)==1) return(find_hab)
 				if(nrow(find_hab)>1){
-					find_hab$value <- mean(find_hab$value)
-					return(find_hab[1,])
+					if(any(find_hab$Type == "Observed")){
+						find_hab_sub <- find_hab %>% filter(Type == "Observed")
+						if(nrow(find_hab_sub) == 1) return(find_hab_sub)
+						if(nrow(find_hab_sub) > 1){
+							find_hab_sub$value <- mean(find_hab_sub$value)
+							return(find_hab_sub[1,])
+						}
+					} else{
+						find_hab$value <- mean(find_hab$value)
+						return(find_hab[1,])
+					}
 				}
 			})
 			hab_new <- do.call(rbind, hab_new)
@@ -151,7 +163,7 @@ hablist <- lapply(1:n_p, function(p){
 		}
 	## if habitat variable is land cover or coho distribution
 	} else {
-		sub <- unique(sub %>% select(-Year))
+		sub <- unique(sub %>% select(-Year)) %>% mutate(Type = "Observed")
 
 		missing_child <- net_nodes[which(net_nodes %in% sub$child_s == FALSE)]
 		if(length(missing_child)>0){
@@ -183,20 +195,23 @@ hablist <- lapply(1:n_p, function(p){
 								hab_fill$Lon = Network_sz_LL[which(Network_sz_LL$child_s == missing_child[x]),"Lon"]
 							}
 					} 
+					hab_fill <- hab_fill %>% mutate(Type = "Interpolated")
 					return(hab_fill)
 				})	
 				fill <- do.call(rbind, fill)
 
 			p3 <- ggplot(fill)+
-			geom_point(aes(x=Lon,y=Lat,color=value)) +
-			geom_point(data=sub, aes(x=Lon, y=Lat, fill=value), pch=22, cex=3) +
+			geom_point(aes(x=Lon,y=Lat,color=value), pch = 20) +
+			geom_point(data=sub, aes(x=Lon, y=Lat, fill=value), pch=21, cex=3) +
 			guides(color = FALSE, fill = guide_legend(title = var_names[p])) +
-			ggtitle(paste0(var_names[p], " (", habvar[p], ")", " interpolated")) +
+			# ggtitle(paste0(var_names[p], " (", habvar[p], ")", " interpolated")) +
 			xlab("Longitude") + ylab("Longitude") +
-			scale_color_viridis_d() +
-			scale_fill_viridis_d() +
-			mytheme()	
-			ggsave(file.path(fig_dir, paste0(habvar[p], "_interpolated.png")),p3)		
+			scale_color_brewer(palette = "Spectral") +
+			scale_fill_brewer(palette = "Spectral") +
+			# scale_color_viridis_d() +
+			# scale_fill_viridis_d() +
+			theme_bw(base_size = 14)	
+			ggsave(file.path(fig_dir, paste0(habvar[p], "_interpolated.png")),p3, height = 7, width = 10)		
 				
 				sub <- rbind(sub, fill)
 		}

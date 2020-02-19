@@ -814,6 +814,7 @@ VASTPlotUtils::plot_range_index(Report = fit$Report, TmbData = fit$data_list, Sd
 
 
 bi <- plot_biomass_index(fit = fit, Sdreport = fit$parameter_estimates$SD, DirName = fig, category_names = c("Spawners", "Juveniles"), add = spawn_info, Plot_suffix = "Count", interval_width = 1.96)
+
 ji <- bi %>% filter(Category == "Juveniles") %>% 
    mutate(Proplow = Ybound_low/Estimate) %>%
    mutate(Prophigh = Ybound_high/Estimate)
@@ -948,11 +949,9 @@ fit = fit_model( "settings"=settings,
                     input_grid=cbind("Lat"=Data[,"Lat"], "Lon"=Data[,"Lon"],"child_i"=Data[,"Knot"],"Area_km2"=Data[,"AreaSwept_km2"])), 
                   spatial_args=list(Network_sz_LL=Network_sz_LL),
                   Network_sz = Network_sz,
-                  model_args = list(Map = Map),
                   X_gtp = X_gtp_inp, X_itp = X_itp_inp,
                   Xconfig_zcp = Xconfig_all2, 
-                  test_fit = FALSE,
-                  optimize_args = list(startpar = fit1$parameter_estimates$par))
+                  test_fit = FALSE)
 
 ## check parameter estimates and final gradients
 fit$parameter_estimates$diagnostics
@@ -963,7 +962,7 @@ saveRDS(fit, file.path(path, "Fit.rds"))
 ## load model fit
 fit <- readRDS(file.path(path, "Fit.rds")) 
 
-dens_base <- quantile(log(fit$Report$D_gcy))
+dens <- quantile(log(fit$Report$D_gcy))
 VASTPlotUtils::plot_maps(plot_set = c(3), fit = fit, Sdreport = fit$parameter_estimates$SD, TmbData = fit$data_list, spatial_list = fit$spatial_list, DirName = fig, category_names = c("Spawners", "Juveniles"), cex = 0.5, Zlim = c(min(dens), max(dens)))
 VASTPlotUtils::plot_maps(plot_set = c(7,11,13,14), fit = fit, Sdreport = fit$parameter_estimates$SD, TmbData = fit$data_list, spatial_list = fit$spatial_list, DirName = fig, category_names = c("Spawners", "Juveniles"), cex = 0.5)
 VASTPlotUtils::plot_maps(plot_set = c(3), fit = fit, Sdreport = fit$parameter_estimates$SD, TmbData = fit$data_list, spatial_list = fit$spatial_list, DirName = fig, category_names = c("Spawners", "Juveniles"), cex = 0.75, Panel = "Year", Zlim = c(min(dens), max(dens)))
@@ -971,6 +970,12 @@ VASTPlotUtils::plot_maps(plot_set = c(3), fit = fit, Sdreport = fit$parameter_es
 ## plot effective area occupied and center of gravity
 VASTPlotUtils::plot_range_index(Report = fit$Report, TmbData = fit$data_list, Sdreport = fit$parameter_estimates$SD, Znames = colnames(fit$data_list$Z_xm), PlotDir = fig, Year_Set = fit$year_labels, use_biascorr = TRUE, category_names = c("Spawners", "Juveniles"))
 
+bi <- plot_biomass_index(fit = fit, Sdreport = fit$parameter_estimates$SD, DirName = fig, category_names = c("Spawners", "Juveniles"), add = spawn_info, Plot_suffix = "Count", interval_width = 1.96)
+
+Data_count[juvyr_index,]
+find_yr <- fit$Report$D_gcy[,,dim(fit$Report$D_gcy)[3]]
+find_knot <- find_yr[Data_count[juvyr_index,"Knot"],]
+find_juv <- find_knot[,2]
 
 
 #############################

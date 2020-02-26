@@ -37,11 +37,11 @@ habfull <- readRDS(file.path(data_dir, "NZ_habitat.rds"))
 
 network_sub <- netfull %>% filter(grepl("aikato", CatName))
 
-network_sub2 <- netfull %>% filter(nzsegment %in% obslen$nzsegment)
 
+obsfull <- obsfull %>% mutate(Num = 1:nrow(obsfull))
 obs_sub1 <- obsfull %>% filter(grepl("aikato", CatName))
 obs_sub2 <- obsfull %>% filter(grepl("aikato", source))
-obs_sub <- rbind.data.frame(obs_sub1, obs_sub2)
+obs_sub <- unique(rbind.data.frame(obs_sub1, obs_sub2))
 
 all(obs_sub2$nzsegment %in% netfull$nzsegment)
 all(obs_sub$nzsegment %in% network_sub$nzsegment)

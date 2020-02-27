@@ -1750,3 +1750,53 @@ p <- ggplot(ep_diag %>% filter(is.na(frequency) == FALSE)) +
   xlab("Observed encounter probability") + ylab("Predicted encounter probability") +
   theme_bw(base_size = 14)
 ggsave(file.path(fig_dir, "Compare_encounter_diagnostic.png"), p, height = 6, width = 14)
+
+## epsilon
+eps_byModel <- lapply(1:2, function(x){
+  if(x == 1){
+    Report <- modelA$Report
+    year_labels = modelA$year_labels
+    years_to_plot = modelA$years_to_plot
+    spatial_list <- modelA$spatial_list
+    name <- "Spatiotemporal variation,\n Method covariates"
+  }
+    if(x == 2){
+    Report <- modelB$Report
+    year_labels = modelB$year_labels
+    years_to_plot = modelB$years_to_plot
+    spatial_list <- modelB$spatial_list
+    name <- "Spatiotemporal variation w/smoother,\nMethod covariates"
+  }
+  # if(x == 1){
+  #   Report <- modelC$Report
+  #   year_labels = modelC$year_labels
+  #   years_to_plot = modelC$years_to_plot
+  #   spatial_list <- modelC$spatial_list
+  #   name <- "No spatiotemporal variation,\n Habitat & Method covariates"
+  # }
+  
+  
+  Array_xct = Report$Epsilon1_gct
+  dimnames(Array_xct) <- list(Node = 1:dim(Array_xct)[1], Category = c("Longfin eels"), Year = year_labels)
+  xct <- reshape2::melt(Array_xct) %>% mutate(Model = name)
+  xctll <- full_join(xct, cbind.data.frame("Node" = 1:spatial_list$n_g,spatial_list$latlon_g))
+  return(xctll)
+})
+eps <- do.call(rbind, eps_byModel)
+
+plot_eps <- eps %>% filter(Year %in% c(1965, 1995, 2018))
+
+p <- ggplot(plot_eps) +
+  geom_point(aes(x = Lon, y = Lat, color = abs(value)), cex = 0.2, alpha = 0.75) +
+  scale_color_distiller(palette = "Spectral") +
+  scale_fill_distiller(palette = "Spectral") +
+  facet_grid(Year ~ Model) +
+  xlab("Longitude") + ylab("Latitude") +
+  guides(color=guide_colourbar(title="Variation")) +
+  theme_bw(base_size = 14)
+ggsave(file.path(fig_dir, "Epsilon_compare.png"), p, height = 10, width = 9)
+
+
+
+
+

@@ -203,6 +203,11 @@ nz_waitaki_longfin_eel$network <- network_sub
 nz_waitaki_longfin_eel$habitat <- hab_sub3
 save(nz_waitaki_longfin_eel, file=file.path(data_dir2, "nz_waitaki_longfin_eel.rda"))
 
+
+network_sub <- readRDS(file.path(data_dir2, "Waitaki_network.rds"))
+obs_sub <- readRDS(file.path(data_dir2, "Waitaki_observations.rds"))
+
+colors <- RColorBrewer::brewer.pal(3,"Set1")
 catchmap2 <- ggplot() +
 		geom_point(data=netfull, aes(x = long, y = lat), col = "black", cex=0.2) +
 		geom_point(data = network_sub, aes(x = long, y = lat), col = "gray") +
@@ -210,9 +215,17 @@ catchmap2 <- ggplot() +
 		xlab("Longitude") + ylab("Latitude") +
 		# scale_fill_brewer(palette = "Set1") +
 		theme_bw(base_size = 14)
-ggsave(file.path(fig_dir, "Waitaki_on_NZ.png"), catchmap2)
+ggsave(file.path(fig_dir, "Waitaki_on_NZ.png"), catchmap2, height = 8, width = 9)
 
-
+catchmap3 <- ggplot(obs_sub) +
+	geom_point(data = network_sub, aes(x = long, y = lat), col = "gray") +
+	geom_point(aes(x = long, y = lat, col = data_value > 0), alpha = 0.6) +
+	facet_wrap(.~year) +
+	xlab("Longitude") + ylab("Latitude") +
+	scale_color_brewer(palette = "Set1") +
+	guides(color = guide_legend(title = "Encounter")) +
+	theme_bw(base_size = 14)
+ggsave(file.path(fig_dir, "Waitaki_encounters.png"), catchmap3, height = 12, width = 15)
 
 
 

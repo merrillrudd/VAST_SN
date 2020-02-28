@@ -166,6 +166,20 @@ obslen3$child_i <- obs_children
 saveRDS(netsub_toUse, file.path(data_dir, "Greater_waikato_network.rds"))
 saveRDS(obslen3, file.path(data_dir, "Greater_waikato_observations.rds"))
 
+
+network_sub <- readRDS(file.path(data_dir, "Greater_waikato_network.rds"))
+obs_sub <- readRDS(file.path(data_dir, "Greater_waikato_observations.rds"))
+
+catchmap2 <- ggplot() +
+		geom_point(data=netfull, aes(x = long, y = lat), col = "black", cex=0.2) +
+		geom_point(data = network_sub, aes(x = long, y = lat), col = "gray") +
+		# geom_point(data=obsfull %>% filter(data_type=="encounter"), aes(x = long, y = lat, fill=data_type), pch=22, alpha=0.6) +
+		xlab("Longitude") + ylab("Latitude") +
+		# scale_fill_brewer(palette = "Set1") +
+		theme_bw(base_size = 14)
+ggsave(file.path(fig_dir, "Waikato_on_NZ.png"), catchmap2, height = 8, width = 9)
+
+
 netsub <- readRDS(file.path(data_dir, "Greater_waikato_network.rds"))
 habsub <- habfull %>% filter(nzsegment %in% netsub$nzsegment) %>% filter(covariate != "width")
 length(which(is.na(habsub$value)))

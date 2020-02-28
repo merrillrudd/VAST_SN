@@ -1295,6 +1295,72 @@ p <- ggplot(plot_eps) +
   theme_bw(base_size = 14)
 ggsave(file.path(fig_dir, "Epsilon_compare.png"), p, height = 10, width = 9)
 
+pr_byModel <- lapply(1:3, function(x){
+  if(x == 1){
+    Report <- modelA$Report
+    year_labels = modelA$year_labels
+    years_to_plot = modelA$years_to_plot
+    spatial_list <- modelA$spatial_list
+    df <- modelA$data_frame
+    name <- "Spatiotemporal variation,\n Habitat & Method*Agency covariates"
+  }
+    if(x == 2){
+    Report <- modelB$Report
+    year_labels = modelB$year_labels
+    years_to_plot = modelB$years_to_plot
+    spatial_list <- modelB$spatial_list
+    df <- modelB$data_frame
+    name <- "Spatiotemporal variation,\n Habitat & Method covariates"
+  }
+  if(x == 3){
+    Report <- modelC$Report
+    year_labels = modelC$year_labels
+    years_to_plot = modelC$years_to_plot
+    spatial_list <- modelC$spatial_list
+    df <- modelC$data_frame
+    name <- "No spatiotemporal variation,\n Habitat & Method covariates"
+  }
+
+## Pearson resids for detection and catch rate
+  D_i <- Report$R1_i*Report$R2_i
+  PR1_i <- PR2_i <- rep(NA, length(D_i))
+  for(i in 1:length(D_i)){
+    
+    ## bernoulli for presence
+      mui <- Report$R1_i[i]
+      obs <- as.numeric(df$b_i[i]>0)
+      PR1_i[i] <- (obs-mui)/sqrt(mui*(1-mui)/1)
+    
+    ## NA for 0 observations
+    obs <- df$b_i[i]
+    if(obs>0){
+      ## make sure to use the right variance as this depends on gear type
+      # gr <- as.numeric(Data_Geostat$Gear[i])
+      # if(ObsModel == 1) PR2_i[i] <- (log(obs)-log(Report$R2_i[i])+Report$SigmaM[1]^2/2)/Report$SigmaM[1]
+      # if(ObsModel %in% c(7,11)) PR2_i[i] <- (log(obs)-log(Report$R2_i[i]))/log(Report$R2_i[i])
+      PR2_i[i] <- (log(obs)-log(Report$R2_i[i])+Report$SigmaM[1]^2/2)/Report$SigmaM[1]
+
+    }
+  }
+  outdf <- cbind(df, PR1=PR1_i, PR2=PR2_i, positive=ifelse(df$b_i>0,1,0)) %>% mutate(Model = name)
+  xlim <- range(outdf$Lon); ylim <- range(outdf$Lat)
+
+  return(outdf)
+})
+pr_byModel <- do.call(rbind, pr_byModel)
+
+plot_pr <- pr_byModel %>% filter(t_i %in% c(1965, 1995, 2018)) %>% rename(Year = t_i)
+
+p <- ggplot(plot_pr) +
+    geom_point(data = Network_sz_LL, aes(x = Lon, y = Lat), color = "gray", alpha = 0.6) +
+    geom_point(aes(x = Lon_i, y = Lat_i, col = PR1>0, size = abs(PR1)), alpha = 0.7) +
+    facet_grid(Year~Model) +
+    scale_color_brewer(palette = "Set1") +
+    scale_size("Pearson Residual", range = c(0,max(plot_pr$PR1, na.rm = TRUE))) +
+    xlab("Longitude") + ylab("Latitude") +
+    ggtitle("First component") + 
+    theme_bw(base_size = 14)
+ggsave(file.path(fig_dir, "Residual_compare.png"), p, height = 13, width = 12)
 
 
 

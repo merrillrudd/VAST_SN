@@ -240,6 +240,9 @@ hab_sub <- readRDS(file.path(data_dir2, "Waikato_habitat.rds"))
 # 		mytheme()
 # ggsave(file.path(fig_dir, "Waikato_map.png"), catchmap)
 
+obs_sub <- readRDS(file.path(data_dir2, "Waikato_observations.rds"))
+network_sub <- readRDS(file.path(data_dir2, "Waikato_network.rds"))
+
 catchmap2 <- ggplot() +
 		geom_point(data=netfull, aes(x = long, y = lat), col = "black", cex=0.2) +
 		geom_point(data = network_sub, aes(x = long, y = lat), col = "gray") +
@@ -247,8 +250,17 @@ catchmap2 <- ggplot() +
 		xlab("Longitude") + ylab("Latitude") +
 		# scale_fill_brewer(palette = "Set1") +
 		theme_bw(base_size = 14)
-ggsave(file.path(fig_dir, "Waikato_on_NZ.png"), catchmap2)
+ggsave(file.path(fig_dir, "Waikato_on_NZ.png"), catchmap2, height = 8, width = 9)
 
+catchmap3 <- ggplot(obs_sub) +
+	geom_point(data = network_sub, aes(x = long, y = lat), col = "gray") +
+	geom_point(aes(x = long, y = lat, col = data_value > 0), alpha = 0.6) +
+	facet_wrap(.~year) +
+	xlab("Longitude") + ylab("Latitude") +
+	scale_color_brewer(palette = "Set1") +
+	guides(color = guide_legend(title = "Encounter")) +
+	theme_bw(base_size = 14)
+ggsave(file.path(fig_dir, "Waikato_encounters.png"), catchmap3, height = 12, width = 15)
 
 
 

@@ -5,14 +5,19 @@ rm(list=ls())
 ####################
 
 # devtools::install_github("james-thorson/VAST", ref = "3.1.0")
-devtools::install_github("james-thorson/VAST", ref = "development")
-# devtools::install_github("merrillrudd/VASTPlotUtils")
+devtools::install_github("james-thorson/VAST", ref = "master")
+devtools::install_github("florianhartig/DHARMa", subdir = "DHARMa", dependencies = TRUE)
+devtools::install_github("merrillrudd/VASTPlotUtils")
 
 library(VAST)
-devtools::load_all("C://merrill/DHARMa/DHARMa")
-devtools::load_all("C://merrill/TMB_contrib_R/TMBhelper")
-devtools::load_all("C://merrill//FishStatsUtils")
-devtools::load_all("C://merrill//VASTPlotUtils")
+library(DHARMa)
+library(VASTPlotUtils)
+
+# devtools::load_all("~/Projects/Spatiotemporal/FishStatsUtils")
+# devtools::load_all("C://merrill/DHARMa/DHARMa")
+# devtools::load_all("C://merrill/TMB_contrib_R/TMBhelper")
+# devtools::load_all("C://merrill//FishStatsUtils")
+# devtools::load_all("C://merrill//VASTPlotUtils")
 
 library(tidyverse)
 library(ggthemes)
@@ -21,8 +26,8 @@ library(ggthemes)
 ## Directories
 ###################
 
-main_dir <- "C:\\merrill\\VAST_SN\\Oregon_coho"
-# main_dir <- "~/Projects/Spatiotemporal/VAST_SN/Oregon_coho"
+# main_dir <- "C:\\merrill\\VAST_SN\\Oregon_coho"
+main_dir <- "~/Projects/Spatiotemporal/VAST_SN/Oregon_coho"
 data_dir <- file.path(main_dir, "data")
 
 sil_dir <- file.path(main_dir, "Siletz")
@@ -291,7 +296,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 
@@ -315,7 +320,7 @@ Options =  c("Calculate_Range"=1,
 
 ## wrapper function to set up common settings
 Version = FishStatsUtils::get_latest_version()
-settings <- make_settings(Version = Version, n_x = nrow(Network_sz), Region = "Stream_network", FieldConfig=FieldConfig, RhoConfig=RhoConfig, OverdispersionConfig=OverdispersionConfig, Options=Options, ObsModel=ObsModel, purpose = "index2", fine_scale=FALSE, bias.correct=FALSE)
+settings <- make_settings(Version = "VAST_v8_2_0", n_x = nrow(Network_sz), Region = "Stream_network", FieldConfig=FieldConfig, RhoConfig=RhoConfig, OverdispersionConfig=OverdispersionConfig, Options=Options, ObsModel=ObsModel, purpose = "index2", fine_scale=FALSE, bias.correct=FALSE)
 settings$Method <- "Stream_network"
 settings$grid_size_km <- 1
 # Version = "VAST_v8_2_0", 
@@ -369,6 +374,8 @@ saveRDS(fit1, file.path(path, "fit1.rds"))
 
 fit1$parameter_estimates$diagnostics
 
+fit1 <- readRDS(file.path(path, "fit1.rds"))
+
 ## run the model
 fit = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
@@ -405,7 +412,7 @@ VASTPlotUtils::plot_maps(plot_set = c(3), fit = fit, Sdreport = fit$parameter_es
 ## plot effective area occupied and center of gravity
 VASTPlotUtils::plot_range_index(Report = fit$Report, TmbData = fit$data_list, Sdreport = fit$parameter_estimates$SD, Znames = colnames(fit$data_list$Z_xm), PlotDir = fig, Year_Set = fit$year_labels, use_biascorr = TRUE, category_names = "Spawners")
 
-plot_biomass_index(fit = fit, Sdreport = fit$parameter_estimates$SD, DirName = fig, category_names = "Spawners", add = spawn_info, Plot_suffix = "Count", interval_width = 1.96)
+VASTPlotUtils::plot_biomass_index(fit = fit, Sdreport = fit$parameter_estimates$SD, DirName = fig, category_names = "Spawners", add = spawn_info, Plot_suffix = "Count", interval_width = 1.96)
 
 dharmaRes = summary( fit, what="residuals")
 # Various potential plots
@@ -431,7 +438,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 
@@ -571,7 +578,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 
@@ -698,7 +705,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -846,7 +853,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -999,7 +1006,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 ## remove final year
@@ -1151,7 +1158,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -1287,7 +1294,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -1432,7 +1439,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -1573,7 +1580,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -1715,7 +1722,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -1859,7 +1866,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -2005,7 +2012,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count_juv
@@ -2227,7 +2234,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
    dir.create(fig, showWarnings=FALSE)
 
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
    find <- which(Data_count$Obs == choose[ind])
@@ -2302,7 +2309,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
    dir.create(fig, showWarnings=FALSE)
 
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
    find <- which(Data_count$Obs == choose[ind])
@@ -2342,7 +2349,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
    dir.create(fig, showWarnings=FALSE)
 
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
    find <- which(Data_count$Obs == choose[ind])
@@ -2382,7 +2389,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
    dir.create(fig, showWarnings=FALSE)
 
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
    find <- which(Data_count$Obs == choose[ind])
@@ -2422,7 +2429,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
    dir.create(fig, showWarnings=FALSE)
 
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
+   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
    find <- which(Data_count$Obs == choose[ind])

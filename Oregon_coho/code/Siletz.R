@@ -5,8 +5,8 @@ rm(list=ls())
 ####################
 
 # devtools::install_github("james-thorson/VAST", ref = "3.1.0")
-devtools::install_github("james-thorson/VAST", ref = "development")
-devtools::install_github("merrillrudd/VASTPlotUtils")
+# devtools::install_github("james-thorson/VAST", ref = "development")
+# devtools::install_github("merrillrudd/VASTPlotUtils")
 
 library(VAST)
 library(tidyverse)

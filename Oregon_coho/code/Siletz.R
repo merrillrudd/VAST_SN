@@ -291,7 +291,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 
@@ -407,13 +407,23 @@ VASTPlotUtils::plot_range_index(Report = fit$Report, TmbData = fit$data_list, Sd
 
 plot_biomass_index(fit = fit, Sdreport = fit$parameter_estimates$SD, DirName = fig, category_names = "Spawners", add = spawn_info, Plot_suffix = "Count", interval_width = 1.96)
 
+dharmaRes = summary( fit, what="residuals")
+# Various potential plots
+plot(dharmaRes, quantreg = TRUE)
+plot(dharmaRes, quantreg = FALSE)
+plotQQunif(dharmaRes)
+hist(dharmaRes )
+
+plotResiduals(dharmaRes, rank = TRUE, quantreg = FALSE)
+
 #############################
 ## spawners_landcover
+## GAMMA
 ## spawners, land cover, discrete
 #############################
 load(file.path(sil_dir, "general_inputs.Rdata"))
 
-path <- file.path(sil_dir, 'spawners_landcover')
+path <- file.path(sil_dir, 'spawners_landcover_alt')
 dir.create(path, showWarnings=FALSE)
 setwd(path)
 
@@ -421,7 +431,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 
@@ -430,13 +440,13 @@ Data <- Data_count_spawn
 # Data$Catch_KG[which(Data$Catch_KG > 0)] <- log(Data$Catch_KG[which(Data$Catch_KG > 0)])
 
 ## turn on spatial and spatiotemporal effects
-FieldConfig = c("Omega1"=0, "Epsilon1"=0, "Omega2"=1, "Epsilon2"=1)
+FieldConfig = c("Omega1"=1, "Epsilon1"=1, "Omega2"=0, "Epsilon2"=0)
 
 ## IID structure on temporal intercepts
-RhoConfig = c("Beta1"=3, "Beta2"=1, "Epsilon1"=0, "Epsilon2"=0)
+RhoConfig = c("Beta1"=1, "Beta2"=1, "Epsilon1"=0, "Epsilon2"=0)
 
 ## gamma distribution, conventional delta link model
-ObsModel = c("PosDist"=11,"Link"=0)
+ObsModel = c("PosDist"=2,"Link"=1)
 
 ## other options
 OverdispersionConfig = c("Eta1"=0, "Eta2"=0)
@@ -536,6 +546,17 @@ VASTPlotUtils::plot_maps(plot_set = c(3), fit = fit, Sdreport = fit$parameter_es
 VASTPlotUtils::plot_range_index(Report = fit$Report, TmbData = fit$data_list, Sdreport = fit$parameter_estimates$SD, Znames = colnames(fit$data_list$Z_xm), PlotDir = fig, Year_Set = fit$year_labels, use_biascorr = TRUE, category_names = "Spawners")
 
 plot_biomass_index(fit = fit, Sdreport = fit$parameter_estimates$SD, DirName = fig, category_names = "Spawners", add = spawn_info, Plot_suffix = "Count", interval_width = 1.96)
+
+dharmaRes = summary( fit, what="residuals")
+# Various potential plots
+plot(dharmaRes)
+plot(dharmaRes, quantreg = TRUE)
+plot(dharmaRes, quantreg = FALSE)
+plotQQunif(dharmaRes)
+hist(dharmaRes )
+
+plotResiduals(dharmaRes, rank = TRUE, quantreg = FALSE)
+testResiduals(dharmaRes)
 
 #############################
 ## juveniles_landcover
@@ -550,7 +571,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 
@@ -573,7 +594,7 @@ Options =  c("Calculate_Range"=1,
             "Calculate_effective_area"=1)
 
 ## wrapper function to set up common settings
-settings <- make_settings(Version = "VAST_v8_2_0",P n_x = nrow(Network_sz), Region = "Stream_network", FieldConfig=FieldConfig, RhoConfig=RhoConfig, OverdispersionConfig=OverdispersionConfig, Options=Options, ObsModel=ObsModel, purpose = "index", fine_scale=FALSE, bias.correct=FALSE)
+settings <- make_settings(Version = "VAST_v8_2_0", n_x = nrow(Network_sz), Region = "Stream_network", FieldConfig=FieldConfig, RhoConfig=RhoConfig, OverdispersionConfig=OverdispersionConfig, Options=Options, ObsModel=ObsModel, purpose = "index2", fine_scale=FALSE, bias.correct=FALSE)
 settings$Method <- "Stream_network"
 settings$grid_size_km <- 1
 
@@ -581,7 +602,7 @@ settings$grid_size_km <- 1
 fit0 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=rep(0,nrow(Data)), 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -604,7 +625,7 @@ Map <- fit0$tmb_list$Map
 fit1 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=rep(0,nrow(Data)), 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -629,7 +650,7 @@ fit1$parameter_estimates$diagnostics
 fit = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=rep(0,nrow(Data)), 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -677,7 +698,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -706,7 +727,7 @@ settings <- make_settings( Version = "VAST_v8_2_0",
                         OverdispersionConfig=OverdispersionConfig, 
                         Options=Options, 
                         ObsModel=ObsModel, 
-                        purpose = "index", 
+                        purpose = "index2", 
                         fine_scale=FALSE, 
                         bias.correct=FALSE)
 settings$Method <- "Stream_network"
@@ -716,7 +737,7 @@ settings$grid_size_km <- 1
 fit0 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -745,7 +766,7 @@ Map <- fit0$tmb_list$Map
 fit1 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -773,7 +794,7 @@ fit1$parameter_estimates$diagnostics
 fit = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -825,7 +846,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -854,7 +875,7 @@ settings <- make_settings( Version = "VAST_v8_2_0",
                         OverdispersionConfig=OverdispersionConfig, 
                         Options=Options, 
                         ObsModel=ObsModel, 
-                        purpose = "index", 
+                        purpose = "index2", 
                         fine_scale=FALSE, 
                         bias.correct=FALSE)
 settings$Method <- "Stream_network"
@@ -864,7 +885,7 @@ settings$grid_size_km <- 1
 fit0 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -890,7 +911,7 @@ Map <- fit0$tmb_list$Map
 fit1 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -917,7 +938,7 @@ fit1$parameter_estimates$diagnostics
 fit = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -978,7 +999,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 ## remove final year
@@ -1014,7 +1035,7 @@ settings <- make_settings( Version = "VAST_v8_2_0",
                         OverdispersionConfig=OverdispersionConfig, 
                         Options=Options, 
                         ObsModel=ObsModel, 
-                        purpose = "index", 
+                        purpose = "index2", 
                         fine_scale=FALSE, 
                         bias.correct=FALSE)
 settings$Method <- "Stream_network"
@@ -1024,7 +1045,7 @@ settings$grid_size_km <- 1
 fit0 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1050,7 +1071,7 @@ Map <- fit0$tmb_list$Map
 fit1 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1077,7 +1098,7 @@ fit1$parameter_estimates$diagnostics
 fit = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1130,7 +1151,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -1159,7 +1180,7 @@ settings <- make_settings( Version = "VAST_v8_2_0",
                         OverdispersionConfig=OverdispersionConfig, 
                         Options=Options, 
                         ObsModel=ObsModel, 
-                        purpose = "index", 
+                        purpose = "index2", 
                         fine_scale=FALSE, 
                         bias.correct=FALSE)
 settings$Method <- "Stream_network"
@@ -1169,7 +1190,7 @@ settings$grid_size_km <- 1
 fit0 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1193,7 +1214,7 @@ Map <- fit0$tmb_list$Map
 fit1 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1220,7 +1241,7 @@ saveRDS(fit1, file.path(path, "fit1.rds"))
 fit = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1266,7 +1287,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -1295,7 +1316,7 @@ settings <- make_settings( Version = "VAST_v8_2_0",
                         OverdispersionConfig=OverdispersionConfig, 
                         Options=Options, 
                         ObsModel=ObsModel, 
-                        purpose = "index", 
+                        purpose = "index2", 
                         fine_scale=FALSE, 
                         bias.correct=FALSE)
 settings$Method <- "Stream_network"
@@ -1305,7 +1326,7 @@ settings$grid_size_km <- 1
 fit0 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1331,7 +1352,7 @@ Map <- fit0$tmb_list$Map
 fit1 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1360,7 +1381,7 @@ fit1 <- readRDS(file.path(path, "fit1.rds"))
 fit = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1411,7 +1432,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -1440,7 +1461,7 @@ settings <- make_settings( Version = "VAST_v8_2_0",
                         OverdispersionConfig=OverdispersionConfig, 
                         Options=Options, 
                         ObsModel=ObsModel, 
-                        purpose = "index", 
+                        purpose = "index2", 
                         fine_scale=FALSE, 
                         bias.correct=FALSE)
 settings$Method <- "Stream_network"
@@ -1450,7 +1471,7 @@ settings$grid_size_km <- 1
 fit0 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1476,7 +1497,7 @@ Map <- fit0$tmb_list$Map
 fit1 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1503,7 +1524,7 @@ fit1$parameter_estimates$diagnostics
 fit = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1552,7 +1573,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -1581,7 +1602,7 @@ settings <- make_settings( Version = "VAST_v8_2_0",
                         OverdispersionConfig=OverdispersionConfig, 
                         Options=Options, 
                         ObsModel=ObsModel, 
-                        purpose = "index", 
+                        purpose = "index2", 
                         fine_scale=FALSE, 
                         bias.correct=FALSE)
 settings$Method <- "Stream_network"
@@ -1591,7 +1612,7 @@ settings$grid_size_km <- 1
 fit0 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1617,7 +1638,7 @@ Map <- fit0$tmb_list$Map
 fit1 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1645,7 +1666,7 @@ fit1 <- readRDS(file.path(path, "fit1.rds"))
 fit = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1694,7 +1715,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -1723,7 +1744,7 @@ settings <- make_settings( Version = "VAST_v8_2_0",
                         OverdispersionConfig=OverdispersionConfig, 
                         Options=Options, 
                         ObsModel=ObsModel, 
-                        purpose = "index", 
+                        purpose = "index2", 
                         fine_scale=FALSE, 
                         bias.correct=FALSE)
 settings$Method <- "Stream_network"
@@ -1733,7 +1754,7 @@ settings$grid_size_km <- 1
 fit0 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1759,7 +1780,7 @@ Map[["beta1_ft"]] <- factor(rep(NA, length(Map[["beta1_ft"]])))
 fit1 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1788,7 +1809,7 @@ fit1 <- readRDS(file.path(path, "fit1.rds"))
 fit = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1838,7 +1859,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count
@@ -1867,7 +1888,7 @@ settings <- make_settings( Version = "VAST_v8_2_0",
                         OverdispersionConfig=OverdispersionConfig, 
                         Options=Options, 
                         ObsModel=ObsModel, 
-                        purpose = "index", 
+                        purpose = "index2", 
                         fine_scale=FALSE, 
                         bias.correct=FALSE)
 settings$Method <- "Stream_network"
@@ -1877,7 +1898,7 @@ settings$grid_size_km <- 1
 fit0 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1903,7 +1924,7 @@ Map <- fit0$tmb_list$Map
 fit1 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1932,7 +1953,7 @@ fit1 <- readRDS(file.path(path, "fit1.rds"))
 fit = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -1984,7 +2005,7 @@ fig <- file.path(path, "figures")
 dir.create(fig, showWarnings=FALSE)
 
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
 ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
 Data <- Data_count_juv
@@ -2013,7 +2034,7 @@ settings <- make_settings( Version = "VAST_v8_2_0",
                         OverdispersionConfig=OverdispersionConfig, 
                         Options=Options, 
                         ObsModel=ObsModel, 
-                        purpose = "index", 
+                        purpose = "index2", 
                         fine_scale=FALSE, 
                         bias.correct=FALSE)
 settings$Method <- "Stream_network"
@@ -2041,7 +2062,7 @@ Xconfig_juv_spawn[,,1:dim(X_gtp_juv)[3]] <- Xconfig_juv2
 fit0 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=rep(0,nrow(Data)), 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -2067,7 +2088,7 @@ Map <- fit0$tmb_list$Map
 fit1 = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=rep(0,nrow(Data)), 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -2094,7 +2115,7 @@ fit1$parameter_estimates$diagnostics
 fit = fit_model( "settings"=settings, 
                   "Lat_i"=Data[,"Lat"], 
                   "Lon_i"=Data[,"Lon"], 
-                  "t_iz"=Data[,'Year'], 
+                  "t_i"=Data[,'Year'], 
                   "c_i"=rep(0,nrow(Data)), 
                   "b_i"=Data[,'Catch_KG'], 
                   "a_i"=Data[,'AreaSwept_km2'], 
@@ -2181,7 +2202,7 @@ settings <- make_settings( Version = "VAST_v8_2_0",
                         OverdispersionConfig=OverdispersionConfig, 
                         Options=Options, 
                         ObsModel=ObsModel, 
-                        purpose = "index", 
+                        purpose = "index2", 
                         fine_scale=FALSE, 
                         bias.correct=FALSE)
 settings$Method <- "Stream_network"
@@ -2206,7 +2227,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
    dir.create(fig, showWarnings=FALSE)
 
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
    find <- which(Data_count$Obs == choose[ind])
@@ -2217,7 +2238,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
       fit1 = fit_model( "settings"=settings, 
                         "Lat_i"=Data[,"Lat"], 
                         "Lon_i"=Data[,"Lon"], 
-                        "t_iz"=Data[,'Year'], 
+                        "t_i"=Data[,'Year'], 
                         "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                         "b_i"=Data[,'Catch_KG'], 
                         "a_i"=Data[,'AreaSwept_km2'], 
@@ -2242,7 +2263,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
             fit = tryCatch(fit_model( "settings"=settings, 
                               "Lat_i"=Data[,"Lat"], 
                               "Lon_i"=Data[,"Lon"], 
-                              "t_iz"=Data[,'Year'], 
+                              "t_i"=Data[,'Year'], 
                               "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                               "b_i"=Data[,'Catch_KG'], 
                               "a_i"=Data[,'AreaSwept_km2'], 
@@ -2281,7 +2302,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
    dir.create(fig, showWarnings=FALSE)
 
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
    find <- which(Data_count$Obs == choose[ind])
@@ -2292,7 +2313,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
       fit1 = fit_model( "settings"=settings, 
                         "Lat_i"=Data[,"Lat"], 
                         "Lon_i"=Data[,"Lon"], 
-                        "t_iz"=Data[,'Year'], 
+                        "t_i"=Data[,'Year'], 
                         "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                         "b_i"=Data[,'Catch_KG'], 
                         "a_i"=Data[,'AreaSwept_km2'], 
@@ -2321,7 +2342,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
    dir.create(fig, showWarnings=FALSE)
 
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
    find <- which(Data_count$Obs == choose[ind])
@@ -2332,7 +2353,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
       fit1 = fit_model( "settings"=settings, 
                         "Lat_i"=Data[,"Lat"], 
                         "Lon_i"=Data[,"Lon"], 
-                        "t_iz"=Data[,'Year'], 
+                        "t_i"=Data[,'Year'], 
                         "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                         "b_i"=Data[,'Catch_KG'], 
                         "a_i"=Data[,'AreaSwept_km2'], 
@@ -2361,7 +2382,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
    dir.create(fig, showWarnings=FALSE)
 
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
    find <- which(Data_count$Obs == choose[ind])
@@ -2372,7 +2393,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
       fit1 = fit_model( "settings"=settings, 
                         "Lat_i"=Data[,"Lat"], 
                         "Lon_i"=Data[,"Lon"], 
-                        "t_iz"=Data[,'Year'], 
+                        "t_i"=Data[,'Year'], 
                         "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                         "b_i"=Data[,'Catch_KG'], 
                         "a_i"=Data[,'AreaSwept_km2'], 
@@ -2401,7 +2422,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
    dir.create(fig, showWarnings=FALSE)
 
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.cpp"), to = path)
-   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.so"), to = path)
+   ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.dll"), to = path)
    ignore <- file.copy(from = file.path(sil_dir, "VAST_v8_2_0.o"), to = path)
 
    find <- which(Data_count$Obs == choose[ind])
@@ -2412,7 +2433,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
       fit1 = fit_model( "settings"=settings, 
                         "Lat_i"=Data[,"Lat"], 
                         "Lon_i"=Data[,"Lon"], 
-                        "t_iz"=Data[,'Year'], 
+                        "t_i"=Data[,'Year'], 
                         "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                         "b_i"=Data[,'Catch_KG'], 
                         "a_i"=Data[,'AreaSwept_km2'], 
@@ -2436,7 +2457,7 @@ choose <- sample(Data_count$Obs[which(Data_count$Category == "Juveniles")], leng
             fit = tryCatch(fit_model( "settings"=settings, 
                               "Lat_i"=Data[,"Lat"], 
                               "Lon_i"=Data[,"Lon"], 
-                              "t_iz"=Data[,'Year'], 
+                              "t_i"=Data[,'Year'], 
                               "c_i"=as.numeric(Data[,"CategoryNum"]) - 1, 
                               "b_i"=Data[,'Catch_KG'], 
                               "a_i"=Data[,'AreaSwept_km2'], 

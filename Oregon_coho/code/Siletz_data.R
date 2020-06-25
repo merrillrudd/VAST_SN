@@ -12,8 +12,8 @@ library(VASTPlotUtils)
 ## Directories
 ###################
 
-# main_dir <- "C:\\merrill\\OR_coho"
-main_dir <- "~/Projects/Spatiotemporal/VAST_SN/Oregon_coho"
+main_dir <- "C:\\merrill\\VAST_SN\\Oregon_coho"
+# main_dir <- "~/Projects/Spatiotemporal/VAST_SN/Oregon_coho"
 data_dir <- file.path(main_dir, "data")
 
 sil_dir <- file.path(main_dir, "Siletz")
@@ -32,8 +32,8 @@ hab_all <- readRDS(file.path(data_dir, "habitat.rds"))
 
 ## subset Siletz
 network <- readRDS(file.path(data_dir, "siletz_network.rds")) 
-obs <- obs_all %>% filter(Population == "Siletz") %>% filter(dist_i > 0)
-hab <- hab_all %>% filter(Population == "Siletz")
+obs <- obs_all %>% dplyr::filter(Population == "Siletz")# %>% filter(dist_i > 0)
+hab <- hab_all %>% dplyr::filter(Population == "Siletz")
 
 saveRDS(obs, file.path(data_dir, "siletz_observations.rds"))
 

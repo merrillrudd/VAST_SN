@@ -42,7 +42,7 @@ saveRDS(obs, file.path(data_dir, "siletz_observations.rds"))
 ####################
 net_nodes <- network$child_s
 Network_sz_LL <- network
-Network_sz <- network %>% select("parent_s", "child_s", "dist_s")
+Network_sz <- network %>% dplyr::select("parent_s", "child_s", "dist_s")
 # net <- plot_network(Network_sz_LL = Network_sz_LL, arrows=TRUE, root=TRUE)
 # ggsave(file.path(fig_dir, "Network.png"), net)
 
@@ -64,8 +64,8 @@ Data_count <- data.frame( "Catch_KG" = obs$Count,
                "Category" = obs$Survey,
                "CategoryNum" = sapply(1:length(obs$Survey), function(x) ifelse(obs$Survey[x]=="Spawners", 1, ifelse(obs$Survey[x]=="Juveniles", 2, NA))))
 
-Data_count_spawn <- Data_count %>% filter(Category == "Spawners")
-Data_count_juv <- Data_count %>% filter(Category == "Juveniles")
+Data_count_spawn <- Data_count %>% dplyr::filter(Category == "Spawners")
+Data_count_juv <- Data_count %>% dplyr::filter(Category == "Juveniles")
 
 Data_dens <- data.frame( "Catch_KG" = obs$Density, 
               "Year" = as.numeric(obs$Year),
@@ -78,8 +78,8 @@ Data_dens <- data.frame( "Catch_KG" = obs$Density,
                "Category" = obs$Survey,
                "CategoryNum" = sapply(1:length(obs$Survey), function(x) ifelse(obs$Survey[x]=="Spawners", 1, ifelse(obs$Survey[x]=="Juveniles", 2, NA))))
 
-Data_dens_spawn <- Data_dens %>% filter(Category == "Spawners")
-Data_dens_juv <- Data_dens %>% filter(Category == "Juveniles")
+Data_dens_spawn <- Data_dens %>% dplyr::filter(Category == "Spawners")
+Data_dens_juv <- Data_dens %>% dplyr::filter(Category == "Juveniles")
 
 # plot_network(Network_sz_LL = Network_sz_LL, Data = Data_count, arrows=TRUE, FilePath=fig_dir, FileName = "Survey_Locs")
 # # plot_network(Network_sz_LL = Network_sz_LL, Data = Data_count, arrows=TRUE, byYear=TRUE, FilePath=fig_dir, FileName = "Survey_Locs_byYear")
@@ -96,11 +96,11 @@ var_names <- c("Land cover", "Coho distribution", "Gradient", "Secondary channel
 
 ## interpolation
 hablist <- lapply(1:n_p, function(p){
-	sub <- unique(hab %>% filter(variable == habvar[p])) #%>% select(-Year)) #%>% filter(Population=="Siletz")
+	sub <- unique(hab %>% dplyr::filter(variable == habvar[p])) #%>% dplyr::select(-Year)) #%>% dplyr::filter(Population=="Siletz")
 
 	## if habitat variable is not land cover or coho distribution
 	if(habvar[p] %in% c("land_cover", "Coho_distr") == FALSE){
-		sub <- unique(sub %>% filter(Year > 0)) %>% select(-Year)
+		sub <- unique(sub %>% dplyr::filter(Year > 0)) %>% dplyr::select(-Year)
 		sub$value <- as.numeric(sub$value)
 
 		if(nrow(sub)<nrow(Network_sz)){
@@ -139,11 +139,11 @@ hablist <- lapply(1:n_p, function(p){
 			hab_new <- lapply(1:nrow(Network_sz_LL), function(x){
 			# for(x in 1:nrow(Network_sz_LL)){
 				child <- Network_sz_LL$child_s[x]
-				find_hab <- hab_info %>% filter(child_s==child)
+				find_hab <- hab_info %>% dplyr::filter(child_s==child)
 				if(nrow(find_hab)==1) return(find_hab)
 				if(nrow(find_hab)>1){
 					if(any(find_hab$Type == "Observed")){
-						find_hab_sub <- find_hab %>% filter(Type == "Observed")
+						find_hab_sub <- find_hab %>% dplyr::filter(Type == "Observed")
 						if(nrow(find_hab_sub) == 1) return(find_hab_sub)
 						if(nrow(find_hab_sub) > 1){
 							find_hab_sub$value <- mean(find_hab_sub$value)
@@ -163,19 +163,19 @@ hablist <- lapply(1:n_p, function(p){
 		}
 	## if habitat variable is land cover or coho distribution
 	} else {
-		sub <- unique(sub %>% select(-Year)) %>% mutate(Type = "Observed")
+		sub <- unique(sub %>% dplyr::select(-Year)) %>% mutate(Type = "Observed")
 
 		missing_child <- net_nodes[which(net_nodes %in% sub$child_s == FALSE)]
 		if(length(missing_child)>0){
 				fill <- lapply(1:length(missing_child), function(x){
-					find_next <- Network_sz_LL %>% filter(child_s == missing_child[x])
-					find_prev <- Network_sz_LL %>% filter(parent_s == missing_child[x])		
+					find_next <- Network_sz_LL %>% dplyr::filter(child_s == missing_child[x])
+					find_prev <- Network_sz_LL %>% dplyr::filter(parent_s == missing_child[x])		
 
 					if(nrow(find_next)>0){
-						hab_next <- sub %>% filter(child_s == find_next$parent_s)
+						hab_next <- sub %>% dplyr::filter(child_s == find_next$parent_s)
 					} else { hab_next <- NULL }
 					if(nrow(find_prev)>0){
-						hab_prev <- sub %>% filter(child_s == find_prev$child_s)
+						hab_prev <- sub %>% dplyr::filter(child_s == find_prev$child_s)
 					} else{ hab_prev <- NULL}		
 
 					hab_fill <- NULL
@@ -220,7 +220,7 @@ hablist <- lapply(1:n_p, function(p){
 })
 hab_df <- do.call(rbind, hablist)
 
-# hab_spread <- hab_df %>% select(-c(Lon, Lat, HabitatImpact)) %>% tidyr::spread(key = variable, value = value)
+# hab_spread <- hab_df %>% dplyr::select(-c(Lon, Lat, HabitatImpact)) %>% tidyr::spread(key = variable, value = value)
 # hab_spread$GRADIENT <- as.numeric(hab_spread$GRADIENT)
 # hab_spread$LWDVOL1 <- as.numeric(hab_spread$LWDVOL1)
 # hab_spread$PCTSWPOOL <- as.numeric(hab_spread$PCTSWPOOL)
@@ -234,7 +234,7 @@ hab_df <- do.call(rbind, hablist)
 # ppairs1 <- ggpairs(data=hab_spread, columns=3:ncol(hab_spread)) +
 # 		mytheme()
 
-# hab_spread2 <- hab_spread %>% select(-c(PCTSWPOOL, LWDVOL1))
+# hab_spread2 <- hab_spread %>% dplyr::select(-c(PCTSWPOOL, LWDVOL1))
 # ppairs <- ggpairs(data=hab_spread2, columns=3:ncol(hab_spread2)) +
 # 		mytheme()
 

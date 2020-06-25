@@ -100,6 +100,16 @@ hablist <- lapply(1:n_p, function(p){
 
 	## if habitat variable is not land cover or coho distribution
 	if(habvar[p] %in% c("land_cover", "Coho_distr") == FALSE){
+		# sub2 <- unique(sub)
+		# sub3 <- sub2 %>% dplyr::filter(Year == 0)
+		# p <- ggplot(sub3) + geom_point(aes(x = Lon, y = Lat, col = value))
+
+		# sub4 <- sub2 %>% dplyr::filter(Year > 0)
+		# sub4$value <- as.numeric(sub4$value)
+		# p <- ggplot(sub4) + geom_point(aes(x = Lon, y = Lat, col = value)) + facet_wrap(~Year)
+		# p <- ggplot(sub4, aes(x = Year, y = value)) + geom_point() + geom_smooth(method = "lm")
+
+		## samples from specific years but not many samples per year
 		sub <- unique(sub %>% dplyr::filter(Year > 0)) %>% dplyr::select(-Year)
 		sub$value <- as.numeric(sub$value)
 
@@ -163,6 +173,14 @@ hablist <- lapply(1:n_p, function(p){
 		}
 	## if habitat variable is land cover or coho distribution
 	} else {
+		# sub2 <- unique(sub)
+		# sub3 <- sub2 %>% dplyr::filter(Year == 0)
+		# p <- ggplot(sub3) + geom_point(aes(x = Lon, y = Lat, col = value))
+
+		# sub4 <- sub2 %>% dplyr::filter(Year > 0)
+		# p <- ggplot(sub4) + geom_point(aes(x = Lon, y = Lat, col = value)) + facet_wrap(~Year)
+
+		## remove year --- year only available for a few data points, others have no year assigned
 		sub <- unique(sub %>% dplyr::select(-Year)) %>% mutate(Type = "Observed")
 
 		missing_child <- net_nodes[which(net_nodes %in% sub$child_s == FALSE)]
@@ -219,6 +237,8 @@ hablist <- lapply(1:n_p, function(p){
 	return(sub)
 })
 hab_df <- do.call(rbind, hablist)
+
+
 
 # hab_spread <- hab_df %>% dplyr::select(-c(Lon, Lat, HabitatImpact)) %>% tidyr::spread(key = variable, value = value)
 # hab_spread$GRADIENT <- as.numeric(hab_spread$GRADIENT)

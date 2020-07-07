@@ -1,0 +1,78 @@
+$par
+     beta1_ft    gamma1_ctp    gamma2_ctp    L_omega2_z  L_epsilon2_z 
+ 6.631898e+00  8.707337e+00 -1.301995e-01  1.723833e-15  3.562536e-01 
+    L_beta2_z     logkappa2  Beta_mean2_c     logSigmaM 
+-3.534293e-17 -3.267607e+00  5.108491e+00  4.279609e+00 
+
+$objective
+[1] 423.3363
+attr(,"logarithm")
+[1] TRUE
+
+$iterations
+[1] 2
+
+$evaluations
+function gradient 
+       6        3 
+
+$time_for_MLE
+Time difference of 13.50472 secs
+
+$max_gradient
+[1] 5.109036e-06
+
+$Convergence_check
+[1] "There is no evidence that the model is not converged"
+
+$number_of_coefficients
+ Total  Fixed Random 
+ 34614      9  34605 
+
+$AIC
+[1] 864.6726
+attr(,"logarithm")
+[1] TRUE
+
+$diagnostics
+                    Param starting_value Lower           MLE Upper
+beta1_ft         beta1_ft   5.612801e+00  -Inf  6.631898e+00   Inf
+gamma1_ctp     gamma1_ctp   6.639189e+00  -Inf  8.707337e+00   Inf
+gamma2_ctp     gamma2_ctp  -1.301976e-01  -Inf -1.301995e-01   Inf
+L_omega2_z     L_omega2_z   4.188450e-05  -Inf  1.723833e-15   Inf
+L_epsilon2_z L_epsilon2_z   3.562532e-01  -Inf  3.562536e-01   Inf
+L_beta2_z       L_beta2_z  -1.271982e-06  -Inf -3.534293e-17   Inf
+logkappa2       logkappa2  -3.267663e+00  -Inf -3.267607e+00   Inf
+Beta_mean2_c Beta_mean2_c   5.108480e+00  -Inf  5.108491e+00   Inf
+logSigmaM       logSigmaM   4.279621e+00  -Inf  4.279609e+00    10
+             final_gradient
+beta1_ft      -5.109036e-06
+gamma1_ctp    -4.919637e-06
+gamma2_ctp    -5.983407e-07
+L_omega2_z     4.385674e-16
+L_epsilon2_z   4.810483e-06
+L_beta2_z     -1.930229e-16
+logkappa2      6.921820e-08
+Beta_mean2_c  -2.619560e-07
+logSigmaM      3.173469e-07
+
+$SD
+sdreport(.) result
+                  Estimate  Std. Error
+beta1_ft      6.631898e+00 150.0238617
+gamma1_ctp    8.707337e+00 304.4570556
+gamma2_ctp   -1.301995e-01   0.2523857
+L_omega2_z    1.723833e-15   1.9825570
+L_epsilon2_z  3.562536e-01   0.1507657
+L_beta2_z    -3.534293e-17   0.4279044
+logkappa2    -3.267607e+00   0.9013773
+Beta_mean2_c  5.108491e+00   0.5413918
+logSigmaM     4.279609e+00   1.1956322
+Maximum gradient component: 5.109036e-06 
+
+$time_for_sdreport
+Time difference of 10.03105 secs
+
+$time_for_run
+Time difference of 23.81203 secs
+

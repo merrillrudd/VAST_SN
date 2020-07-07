@@ -1,0 +1,62 @@
+$par
+    beta1_ft     beta1_ft   gamma1_ctp   gamma1_ctp   gamma2_ctp   gamma2_ctp 
+10.194972339  1.798866454  1.419254699 -0.252821656  0.034818783 -0.009715954 
+  L_omega2_z   L_omega2_z   L_omega2_z L_epsilon2_z L_epsilon2_z L_epsilon2_z 
+ 1.100060054  0.554157473  0.999800868  0.449596657  0.670102379  0.007108939 
+   L_beta2_z    L_beta2_z    logkappa2 Beta_mean2_c Beta_mean2_c    logSigmaM 
+ 1.000149435  0.266885139 -1.414970345 -0.387665811  4.030438490  0.692769633 
+   logSigmaM    logSigmaM 
+ 2.066167705 -2.225099027 
+
+$objective
+[1] 1726.128
+
+$iterations
+[1] 1
+
+$evaluations
+function gradient 
+      39        1 
+
+$time_for_MLE
+Time difference of 11.84227 secs
+
+$max_gradient
+[1] 23576256
+
+$Convergence_check
+[1] "The model is likely not converged"
+
+$number_of_coefficients
+ Total  Fixed Random 
+ 69230     20  69210 
+
+$AIC
+[1] 3492.255
+
+$diagnostics
+          Param starting_value Lower          MLE Upper final_gradient
+1      beta1_ft   10.194972339  -Inf 10.194972339   Inf       208.3921
+2      beta1_ft    1.798866454  -Inf  1.798866454   Inf  10865487.7318
+3    gamma1_ctp    1.419254699  -Inf  1.419254699   Inf      -110.3781
+4    gamma1_ctp   -0.252821656  -Inf -0.252821656   Inf  -5354275.0453
+5    gamma2_ctp    0.034818783  -Inf  0.034818783   Inf  -1530892.9362
+6    gamma2_ctp   -0.009715954  -Inf -0.009715954   Inf   7641681.5796
+7    L_omega2_z    1.100060054  -Inf  1.100060054   Inf  -1656822.6636
+8    L_omega2_z    0.554157473  -Inf  0.554157473   Inf  18583443.0182
+9    L_omega2_z    0.999800868  -Inf  0.999800868   Inf  12530833.4650
+10 L_epsilon2_z    0.449596657  -Inf  0.449596657   Inf  -1028030.5214
+11 L_epsilon2_z    0.670102379  -Inf  0.670102379   Inf  10990233.9711
+12 L_epsilon2_z    0.007108939  -Inf  0.007108939   Inf    135442.2125
+13    L_beta2_z    1.000149435  -Inf  1.000149435   Inf   -871302.7803
+14    L_beta2_z    0.266885139  -Inf  0.266885139   Inf  23576255.9992
+15    logkappa2   -1.414970345  -Inf -1.414970345   Inf   4473705.8188
+16 Beta_mean2_c   -0.387665811  -Inf -0.387665811   Inf     47909.1488
+17 Beta_mean2_c    4.030438490  -Inf  4.030438490   Inf  -8479924.7769
+18    logSigmaM    0.692769633  -Inf  0.692769633    10   -550592.8005
+19    logSigmaM    2.066167705  -Inf  2.066167705    10   8986828.7536
+20    logSigmaM   -2.225099027  -Inf -2.225099027    10    242322.9067
+
+$time_for_run
+Time difference of 12.19336 secs
+

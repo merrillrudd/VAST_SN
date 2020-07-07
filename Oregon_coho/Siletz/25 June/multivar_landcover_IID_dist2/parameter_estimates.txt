@@ -1,0 +1,60 @@
+$par
+     beta1_ft      beta1_ft    gamma1_ctp    gamma1_ctp    gamma2_ctp 
+ 1.940753e+00  1.624965e+00  4.648634e-01 -9.159631e-02 -8.733792e-02 
+   gamma2_ctp    L_omega2_z    L_omega2_z  L_epsilon2_z  L_epsilon2_z 
+ 1.095552e-01  7.858765e-01  1.641418e+00 -3.246146e-01  2.108056e-05 
+    L_beta2_z     L_beta2_z     logkappa2  Beta_mean2_c  Beta_mean2_c 
+ 8.028838e-01  9.811039e-01 -1.163597e+00  2.403734e+00  4.878325e+00 
+    logSigmaM     logSigmaM 
+-5.001202e-01 -6.970615e+00 
+
+$objective
+[1] 1765.055
+attr(,"logarithm")
+[1] TRUE
+
+$iterations
+[1] 1
+
+$evaluations
+function gradient 
+      12        1 
+
+$time_for_MLE
+Time difference of 29.0345 secs
+
+$max_gradient
+[1] 1.172428e-05
+
+$Convergence_check
+[1] "There is no evidence that the model is not converged"
+
+$number_of_coefficients
+ Total  Fixed Random 
+ 69227     17  69210 
+
+$AIC
+[1] 3564.109
+attr(,"logarithm")
+[1] TRUE
+
+$diagnostics
+          Param starting_value Lower           MLE Upper final_gradient
+1      beta1_ft    1.940755635  -Inf  1.940753e+00   Inf  -6.360071e-11
+2      beta1_ft    1.624965026  -Inf  1.624965e+00   Inf  -6.503909e-12
+3    gamma1_ctp    0.464862898  -Inf  4.648634e-01   Inf   1.642457e-11
+4    gamma1_ctp   -0.091597605  -Inf -9.159631e-02   Inf  -1.705880e-11
+5    gamma2_ctp   -0.087339238  -Inf -8.733792e-02   Inf  -2.329678e-07
+6    gamma2_ctp    0.109551241  -Inf  1.095552e-01   Inf  -3.283054e-06
+7    L_omega2_z    0.785876080  -Inf  7.858765e-01   Inf   2.053509e-07
+8    L_omega2_z    1.641431156  -Inf  1.641418e+00   Inf   1.172428e-05
+9  L_epsilon2_z   -0.324614530  -Inf -3.246146e-01   Inf   2.843990e-08
+10 L_epsilon2_z    0.001004613  -Inf  2.108056e-05   Inf   1.323975e-06
+11    L_beta2_z    0.802885345  -Inf  8.028838e-01   Inf  -6.290408e-10
+12    L_beta2_z    0.981107091  -Inf  9.811039e-01   Inf   3.091703e-06
+13    logkappa2   -1.163588469  -Inf -1.163597e+00   Inf   5.921187e-06
+14 Beta_mean2_c    2.403735537  -Inf  2.403734e+00   Inf   7.914267e-07
+15 Beta_mean2_c    4.878323279  -Inf  4.878325e+00   Inf   1.222039e-06
+16    logSigmaM   -0.500120095  -Inf -5.001202e-01    10   7.505000e-08
+17    logSigmaM   -6.954721473  -Inf -6.970615e+00    10   8.180011e-06
+

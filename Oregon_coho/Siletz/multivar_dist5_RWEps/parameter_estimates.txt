@@ -1,0 +1,54 @@
+$par
+     beta1_ft      beta1_ft    L_omega2_z    L_omega2_z    L_omega2_z 
+ 1.100589e+01  1.946772e+00  4.701979e-03  4.297972e-03 -8.314328e-04 
+ L_epsilon2_z  L_epsilon2_z  L_epsilon2_z     L_beta2_z     L_beta2_z 
+ 2.889857e-01  2.668610e-01 -3.783098e-05  6.259024e-01  5.246725e-01 
+    logkappa2  Beta_mean2_c  Beta_mean2_c 
+-2.033947e+01  1.790751e+00  4.770587e+00 
+
+$objective
+[1] 1831.286
+attr(,"logarithm")
+[1] TRUE
+
+$iterations
+[1] 1
+
+$evaluations
+function gradient 
+      13        1 
+
+$time_for_MLE
+Time difference of 5.076106 mins
+
+$max_gradient
+[1] 0.0123972
+
+$Convergence_check
+[1] "The model is likely not converged"
+
+$number_of_coefficients
+ Total  Fixed Random 
+ 69223     13  69210 
+
+$AIC
+[1] 3688.572
+attr(,"logarithm")
+[1] TRUE
+
+$diagnostics
+          Param starting_value Lower           MLE Upper final_gradient
+1      beta1_ft   1.075215e+01  -Inf  1.100589e+01   Inf   -0.002653558
+2      beta1_ft   1.946260e+00  -Inf  1.946772e+00   Inf    0.002397363
+3    L_omega2_z  -5.685058e-04  -Inf  4.701979e-03   Inf    0.009150283
+4    L_omega2_z  -2.133170e-05  -Inf  4.297972e-03   Inf    0.009250104
+5    L_omega2_z  -1.044933e-04  -Inf -8.314328e-04   Inf   -0.012397205
+6  L_epsilon2_z   2.893375e-01  -Inf  2.889857e-01   Inf   -0.006977652
+7  L_epsilon2_z   2.672737e-01  -Inf  2.668610e-01   Inf    0.001541878
+8  L_epsilon2_z  -2.778869e-04  -Inf -3.783098e-05   Inf   -0.005054710
+9     L_beta2_z   6.247023e-01  -Inf  6.259024e-01   Inf    0.005364999
+10    L_beta2_z   5.232975e-01  -Inf  5.246725e-01   Inf    0.009950871
+11    logkappa2  -2.039461e+01  -Inf -2.033947e+01   Inf   -0.001010040
+12 Beta_mean2_c   1.786643e+00  -Inf  1.790751e+00   Inf    0.006886438
+13 Beta_mean2_c   4.766903e+00  -Inf  4.770587e+00   Inf    0.004593242
+
